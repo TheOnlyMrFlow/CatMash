@@ -1,4 +1,5 @@
 ﻿using CatMash.Models;
+using CatMash.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -11,33 +12,24 @@ namespace CatMashApi.Controllers
     [ApiController]
     public class CatController : ControllerBase
     {
-        private readonly CatContext _context;
+        private readonly CatService _catService;
 
-        public CatController(CatContext context)
+        public CatController(CatService service)
         {
-            _context = context;
+            _catService = service;
 
-            if (_context.Cats.Count() == 0)
-            {
-                // Create a new TodoItem if collection is empty,
-                // which means you can't delete all TodoItems.
-                _context.Cats.Add(new Cat { Id = "Item1" });
-                _context.SaveChanges();
-            }
         }
 
         // GET: api/Todo
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cat>>> GetTodoItems()
-        {
-            return await _context.Cats.ToListAsync();
-        }
+        public ActionResult<List<Cat>> Get() =>
+           _catService.Get();
 
         // GET: api/Todo/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Cat>> GetTodoItem(long id)
+        [HttpGet("{id}", Name = "GetCat")]
+        public ActionResult<Cat> Get(string id)
         {
-            var cat = await _context.Cats.FindAsync(id);
+            var cat = _catService.Get(id);
 
             if (cat == null)
             {
@@ -46,5 +38,44 @@ namespace CatMashApi.Controllers
 
             return cat;
         }
+
+        [HttpPost]
+        public ActionResult<Cat> Create(Cat cat)
+        {
+            _catService.Create(cat);
+
+            return CreatedAtRoute("GetCat", new { id = cat.Id.ToString() }, cat);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(string id, Cat catIn)
+        {
+            var cat = _catService.Get(id);
+
+            if (cat == null)
+            {
+                return NotFound();
+            }
+
+            _catService.Update(id, catIn);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
+        {
+            var cat = _catService.Get(id);
+
+            if (cat == null)
+            {
+                return NotFound();
+            }
+
+            _catService.Remove(cat.Id);
+
+            return NoContent();
+        }
+
     }
 }
