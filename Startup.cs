@@ -38,6 +38,8 @@ namespace CatMash
 
             services.AddSingleton<CatService>();
 
+            services.AddCors(); // Make sure you call this previous to AddMvc
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -55,6 +57,10 @@ namespace CatMash
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseCors(
+                options => options.AllowAnyOrigin().AllowAnyMethod().WithHeaders("content-type")
+            );
 
             app.UseHttpsRedirection();
             app.UseMvc();
