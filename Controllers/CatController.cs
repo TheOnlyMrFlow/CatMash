@@ -39,10 +39,34 @@ namespace CatMashApi.Controllers
             return cat;
         }
 
+        [HttpGet("pick")]
+        public ActionResult<Cat[]> PickOpponents()
+        {
+
+            List<Cat> cats = _catService.Get();
+            int count = cats.Count();
+            var ran = new System.Random();
+
+            int indexOne = ran.Next(count);
+            int indexTwo;
+            do
+            {
+                indexTwo = ran.Next(count);
+            }
+            while (indexOne == indexTwo);
+
+            var catOne = cats[indexOne];
+            var catTwo = cats[indexTwo];
+
+           
+            return new Cat[] { catOne, catTwo };
+        }
+
         [HttpPost]
         public ActionResult<Cat> Create(Cat cat)
         {
             cat.Elo = 1000;
+            cat.Occurences = 0;
             _catService.Create(cat);
 
             return CreatedAtRoute("GetCat", new { id = cat.Id.ToString() }, cat);

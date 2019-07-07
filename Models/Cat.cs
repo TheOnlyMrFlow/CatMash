@@ -21,5 +21,8 @@ namespace CatMash.Models
 
         [BsonElement("elo")]
         public int Elo { get; set; }
+
+        [BsonElement("occurences")]
+        public int Occurences { get; set; }
     }
 }
