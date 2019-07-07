@@ -42,9 +42,37 @@ namespace CatMashApi.Controllers
         [HttpPost]
         public ActionResult<Cat> Create(Cat cat)
         {
+            cat.Elo = 1000;
             _catService.Create(cat);
 
             return CreatedAtRoute("GetCat", new { id = cat.Id.ToString() }, cat);
+        }
+
+        [HttpPatch("{idWinner}/mashes/{idLoser}")]
+        public ActionResult<Cat> Mashes(string idWinner, string idLoser)
+        {
+
+            if (idWinner == idLoser)
+            {
+                return BadRequest("Cannot mash a cat against himself");
+            }
+
+            var catWinner= _catService.Get(idWinner);
+            var catLoser = _catService.Get(idLoser);
+
+            int delta = EloService.CalculateDelta(catWinner.Elo, catLoser.Elo);
+
+            if (catLoser == null || catWinner == null)
+            {
+                System.Diagnostics.Debug.WriteLine(catLoser);
+                return NotFound();
+            }
+
+            return Ok(delta);
+
+            //return CreatedAtRoute("GetCat", new { id = cat.Id.ToString() }, cat);
+
+
         }
 
         [HttpPut("{id}")]

@@ -19,6 +19,7 @@ namespace CatMash.Models
         [BsonElement("id")]
         public string legacyId { get; set; }
 
-        public double Elo { get; set; }
+        [BsonElement("elo")]
+        public int Elo { get; set; }
     }
 }
