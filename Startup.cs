@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CatMash.Models;
+using CatMash.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,10 +29,19 @@ namespace CatMash
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<CatContext>(opt =>
-               opt.UseInMemoryDatabase("CatMash"));
+
+            services.Configure<CatMashDatabaseSettings>(
+                Configuration.GetSection(nameof(CatMashDatabaseSettings)));
+
+            services.AddSingleton<ICatMashDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<CatMashDatabaseSettings>>().Value);
+
+            services.AddSingleton<CatService>();
+
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
