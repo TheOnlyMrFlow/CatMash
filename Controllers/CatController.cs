@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 
 namespace CatMashApi.Controllers
 {
-    [Route("api/cats")]
+    [Route("cats")]
     [ApiController]
     public class CatController : ControllerBase
     {
         private readonly CatService _catService;
+
+
 
         public CatController(CatService service)
         {
@@ -22,8 +24,24 @@ namespace CatMashApi.Controllers
 
         // GET: api/Todo
         [HttpGet]
-        public ActionResult<List<Cat>> Get() =>
-           _catService.Get();
+        public ActionResult<List<Cat>> Get()
+        {
+
+            List<Cat> allCats = _catService.Get();
+            string sortBy = HttpContext.Request.Query["sortBy"].ToString();
+            System.Diagnostics.Debug.WriteLine(sortBy);
+
+            if (sortBy.Equals("elo"))
+            {
+
+                var ordered = allCats.OrderBy(c => c.Elo).ToList();
+                ordered.Reverse();
+                return ordered;
+
+            }
+            return allCats;
+
+        }
 
         // GET: api/Todo/5
         [HttpGet("{id}", Name = "GetCat")]
@@ -84,13 +102,20 @@ namespace CatMashApi.Controllers
             var catWinner= _catService.Get(idWinner);
             var catLoser = _catService.Get(idLoser);
 
-            int delta = EloService.CalculateDelta(catWinner.Elo, catLoser.Elo);
 
             if (catLoser == null || catWinner == null)
             {
                 System.Diagnostics.Debug.WriteLine(catLoser);
                 return NotFound();
             }
+
+            int delta = EloService.CalculateDelta(catWinner.Elo, catLoser.Elo);
+
+            catWinner.Elo += delta;
+            catLoser.Elo -= delta;
+
+            _catService.Update(catWinner.Id, catWinner);
+            _catService.Update(catLoser.Id, catLoser);
 
             return Ok(delta);
 
