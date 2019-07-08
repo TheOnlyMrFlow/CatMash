@@ -113,6 +113,8 @@ namespace CatMashApi.Controllers
 
             catWinner.Elo += delta;
             catLoser.Elo -= delta;
+            catWinner.Occurences++;
+            catLoser.Occurences++;
 
             _catService.Update(catWinner.Id, catWinner);
             _catService.Update(catLoser.Id, catLoser);
