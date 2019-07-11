@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CatMash.Middlewares;
 using CatMash.Models;
 using CatMash.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,8 +35,15 @@ namespace CatMash
             services.Configure<CatMashDatabaseSettings>(
                 Configuration.GetSection(nameof(CatMashDatabaseSettings)));
 
+
             services.AddSingleton<ICatMashDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<CatMashDatabaseSettings>>().Value);
+
+            services.Configure<Secrets>(
+                Configuration.GetSection(nameof(Secrets)));
+
+            services.AddSingleton<ISecrets>(sp =>
+                sp.GetRequiredService<IOptions<Secrets>>().Value);
 
             services.AddSingleton<CatService>();
 
@@ -61,6 +70,14 @@ namespace CatMash
             app.UseCors(
                 options => options.AllowAnyOrigin().AllowAnyMethod().WithHeaders("content-type")
             );
+
+
+            app.UseWhen(   
+                context => context.Request.Path.StartsWithSegments("/cats/admin"),                
+                appBuilder =>
+                {
+                    appBuilder.UseAdminCheck();
+                });
 
             app.UseHttpsRedirection();
             app.UseMvc();

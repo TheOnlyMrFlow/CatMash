@@ -92,7 +92,7 @@ namespace CatMashApi.Controllers
             return new Cat[] { catOne, catTwo };
         }
 
-        [HttpPost]
+        [HttpPost("admin")]
         public ActionResult<Cat> Create(Cat cat)
         {
             cat.Elo = 1000;
@@ -139,7 +139,7 @@ namespace CatMashApi.Controllers
 
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("admin/{id}")]
         public IActionResult Update(string id, Cat catIn)
         {
             var cat = _catService.Get(id);
@@ -154,7 +154,7 @@ namespace CatMashApi.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("admin/{id}")]
         public IActionResult Delete(string id)
         {
             var cat = _catService.Get(id);
