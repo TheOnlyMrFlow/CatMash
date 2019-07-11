@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CatMash.Models;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 namespace CatMash.Services
 {
@@ -76,5 +78,12 @@ namespace CatMash.Services
 
         public void Remove(string id) =>
             _cats.DeleteOne(cat => cat.Id == id);
+
+        public void ResetElo() =>
+            _cats.UpdateMany(cat => true, Builders<Cat>.Update.Set("elo", 1000));
+
+        public void ResetOccurence() =>
+            _cats.UpdateMany(cat => true, Builders<Cat>.Update.Set("occurences", 0));
+
     }
 }

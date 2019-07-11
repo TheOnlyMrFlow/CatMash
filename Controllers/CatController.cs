@@ -92,15 +92,7 @@ namespace CatMashApi.Controllers
             return new Cat[] { catOne, catTwo };
         }
 
-        [HttpPost("admin")]
-        public ActionResult<Cat> Create(Cat cat)
-        {
-            cat.Elo = 1000;
-            cat.Occurences = 0;
-            _catService.Create(cat);
-
-            return CreatedAtRoute("GetCat", new { id = cat.Id.ToString() }, cat);
-        }
+        
 
         [HttpPatch("{idWinner}/mashes/{idLoser}")]
         public ActionResult<Cat> Mashes(string idWinner, string idLoser)
@@ -139,6 +131,16 @@ namespace CatMashApi.Controllers
 
         }
 
+        [HttpPost("admin")]
+        public ActionResult<Cat> Create(Cat cat)
+        {
+            cat.Elo = 1000;
+            cat.Occurences = 0;
+            _catService.Create(cat);
+
+            return CreatedAtRoute("GetCat", new { id = cat.Id.ToString() }, cat);
+        }
+
         [HttpPut("admin/{id}")]
         public IActionResult Update(string id, Cat catIn)
         {
@@ -167,6 +169,25 @@ namespace CatMashApi.Controllers
             _catService.Remove(cat.Id);
 
             return NoContent();
+        }
+
+        [HttpPatch("admin/reset/elo")]
+        public IActionResult ResetElo(string id)
+        {
+
+            _catService.ResetElo();
+
+            return Ok("Elo reset");
+        }
+
+        [HttpPatch("admin/reset/occurence")]
+        public IActionResult ResetOccurence(string id)
+        {
+
+            _catService.ResetOccurence();
+
+            return Ok("Occurence reset");
+            
         }
 
     }
