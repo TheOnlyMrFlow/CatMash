@@ -27,19 +27,21 @@ namespace CatMashApi.Controllers
         public ActionResult<List<Cat>> Get()
         {
 
-            List<Cat> allCats = _catService.Get();
+            
             string sortBy = HttpContext.Request.Query["sortBy"].ToString();
-            System.Diagnostics.Debug.WriteLine(sortBy);
 
-            if (sortBy.Equals("elo"))
+            switch (sortBy)
             {
+                case "elo":
+                    return _catService.Get(CatService.SortBy.elo, true);
 
-                var ordered = allCats.OrderBy(c => c.Elo).ToList();
-                ordered.Reverse();
-                return ordered;
+                case "occurence":
+                    return _catService.Get(CatService.SortBy.occurence);
 
+                default:
+                    return _catService.Get();
             }
-            return allCats;
+
 
         }
 
@@ -61,11 +63,21 @@ namespace CatMashApi.Controllers
         public ActionResult<Cat[]> PickOpponents()
         {
 
-            List<Cat> cats = _catService.Get();
+
+            List<Cat> cats = _catService.Get(CatService.SortBy.occurence);
             int count = cats.Count();
             var ran = new System.Random();
 
-            int indexOne = ran.Next(count);
+            // linear distribution between 0 and 1
+            double ranNum = ran.NextDouble();
+
+            // makes it more likely to be close to 0, i.e the begining of the list, i.e a cat that has not much occurence yet
+            ranNum = System.Math.Pow(ranNum, 3);
+
+            // transpose index from [0,1] to [0, length of list]
+            int indexOne = (int)System.Math.Floor(ranNum * (count - 1));
+
+
             int indexTwo;
             do
             {
@@ -76,7 +88,7 @@ namespace CatMashApi.Controllers
             var catOne = cats[indexOne];
             var catTwo = cats[indexTwo];
 
-           
+
             return new Cat[] { catOne, catTwo };
         }
 
@@ -93,6 +105,7 @@ namespace CatMashApi.Controllers
         [HttpPatch("{idWinner}/mashes/{idLoser}")]
         public ActionResult<Cat> Mashes(string idWinner, string idLoser)
         {
+
 
             if (idWinner == idLoser)
             {

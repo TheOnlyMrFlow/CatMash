@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 namespace CatMash.Services
 {
 
+
     public static class EloService
     {
+
+        public const int MAX_ELO_DIFF_BETWEEN_OPPON = 200;
+
+
+        public const double GEOMETRIC_DISTRIB_P = 0.1;
 
         public const int k = 32;
 

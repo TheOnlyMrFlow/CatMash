@@ -11,6 +11,12 @@ namespace CatMash.Services
     {
         private readonly IMongoCollection<Cat> _cats;
 
+        public enum SortBy
+        {
+            elo,
+            occurence
+        }
+
         public CatService(ICatMashDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
@@ -21,6 +27,37 @@ namespace CatMash.Services
 
         public List<Cat> Get() =>
             _cats.Find(cat => true).ToList();
+
+
+        public List<Cat> Get(SortBy sortBy, bool decreasing = false)
+        {
+            var cats = _cats.Find(cat => true).ToList();
+
+            List<Cat> ordered;
+            
+            switch (sortBy)
+            {
+                case SortBy.elo:
+                    ordered = cats.OrderBy(c => c.Elo).ToList();
+                    break;
+
+                case SortBy.occurence:
+                    ordered = cats.OrderBy(c => c.Occurences).ToList();
+                    break;
+
+                default:
+                    ordered = cats;
+                    break;
+
+            }
+
+            if (decreasing)
+            {
+                ordered.Reverse();
+            }
+
+            return ordered;
+        }
 
         public Cat Get(string id) =>
             _cats.Find<Cat>(cat => cat.Id == id).FirstOrDefault();
