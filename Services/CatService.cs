@@ -27,38 +27,36 @@ namespace CatMash.Services
             _cats = database.GetCollection<Cat>(settings.CatsCollectionName);
         }
 
-        public List<Cat> Get() =>
-            _cats.Find(cat => true).ToList();
+        public IEnumerable<Cat> Get() =>
+            _cats.Find(cat => true).ToEnumerable();
 
 
-        public List<Cat> Get(SortBy sortBy, bool decreasing = false)
+        public IEnumerable<Cat> Get(SortBy sortBy, bool decreasing = false)
         {
-            var cats = _cats.Find(cat => true).ToList();
+            var cats = _cats.Find(cat => true).ToEnumerable();
 
             List<Cat> ordered;
             
             switch (sortBy)
             {
                 case SortBy.elo:
-                    ordered = cats.OrderBy(c => c.Elo).ToList();
+                    cats = cats.OrderBy(c => c.Elo);
                     break;
 
                 case SortBy.occurence:
-                    ordered = cats.OrderBy(c => c.Occurences).ToList();
+                    cats = cats.OrderBy(c => c.Occurences);
                     break;
 
                 default:
-                    ordered = cats;
                     break;
-
             }
 
             if (decreasing)
             {
-                ordered.Reverse();
+                cats = cats.Reverse();
             }
 
-            return ordered;
+            return cats;
         }
 
         public Cat Get(string id) =>
@@ -66,6 +64,8 @@ namespace CatMash.Services
 
         public Cat Create(Cat cat)
         {
+            cat.Elo = 1000;
+            cat.Occurences = 0;
             _cats.InsertOne(cat);
             return cat;
         }
@@ -84,6 +84,25 @@ namespace CatMash.Services
 
         public void ResetOccurence() =>
             _cats.UpdateMany(cat => true, Builders<Cat>.Update.Set("occurences", 0));
+
+        public Cat[] GetRandomMatch()
+        {
+            var ran = new Random();
+            return this.Get(SortBy.occurence).OrderBy(x => ran.NextDouble()).Take(2).ToArray();
+        }
+
+        public void SaveMatchResult(Cat winner, Cat loser)
+        {
+            int delta = EloService.CalculateDelta(winner.Elo, loser.Elo);
+
+            winner.Elo += delta;
+            loser.Elo -= delta;
+            winner.Occurences++;
+            loser.Occurences++;
+
+            this.Update(winner.Id, winner);
+            this.Update(loser.Id, loser);
+        }
 
     }
 }

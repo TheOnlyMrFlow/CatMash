@@ -9,7 +9,6 @@ using Microsoft.Extensions.Primitives;
 
 namespace CatMash.Middlewares
 {
-    // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
     public class AdminCheck
     {
         private readonly RequestDelegate _next;
@@ -62,7 +61,6 @@ namespace CatMash.Middlewares
         }
     }
 
-    // Extension method used to add the middleware to the HTTP request pipeline.
     public static class AdminCheckExtensions
     {
         public static IApplicationBuilder UseAdminCheck(this IApplicationBuilder builder)
