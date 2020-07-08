@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace CatMash.Services
 {
-
-
     public static class EloService
     {
-
         // The value of k affects the volatility of the scores.
         // If k is large, the scores are very volatile, i.e a win gives a lot of elo, and a loss make you lose a lot as well.
         public const int k = 32;
-
 
         // The probabilty that player 1 wins against player 2.
         public static double ExpectationToWin(int catOneRating, int catTwoRating)
@@ -25,8 +17,6 @@ namespace CatMash.Services
         public static int CalculateDelta(int playerOneRating, int playerTwoRating)
         {
             return (int)(k * ExpectationToWin(playerOneRating, playerTwoRating));
-    
         }
     }
-
 }

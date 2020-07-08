@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CatMash.Models;
@@ -22,13 +21,11 @@ namespace CatMash.Middlewares
 
         public async Task Invoke(HttpContext httpContext)
         {
-
             StringValues password;
             httpContext.Request.Headers.TryGetValue("Authorization", out password);
 
             try
             {
-
                 if (password.ElementAt(0).Equals(_secrets.AdminPassword))
                 {
                     await _next(httpContext);
@@ -37,14 +34,12 @@ namespace CatMash.Middlewares
                 {
                     throw new Exception("Wrong password");
                 }
-
             }
             catch (IndexOutOfRangeException e)
             {
 
                 httpContext.Response.StatusCode = 401;
                 await httpContext.Response.WriteAsync("No authorization header found on the request");
-                
             }
             catch(Exception e) when (e.Message.Equals("Wrong password"))
             {
@@ -56,8 +51,6 @@ namespace CatMash.Middlewares
                 httpContext.Response.StatusCode = 401;
                 await httpContext.Response.WriteAsync("You dont have permission for this request");
             }
-
-
         }
     }
 

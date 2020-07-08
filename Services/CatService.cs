@@ -2,10 +2,7 @@
 using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using CatMash.Models;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 
 namespace CatMash.Services
 {

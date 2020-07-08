@@ -1,10 +1,7 @@
 ﻿using CatMash.Models;
 using CatMash.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CatMashApi.Controllers
 {
@@ -75,7 +72,6 @@ namespace CatMashApi.Controllers
             _catService.SaveMatchResult(catWinner, catLoser);
 
             return Ok();
-
         }
 
         [HttpPost("admin")]
@@ -122,6 +118,5 @@ namespace CatMashApi.Controllers
             _catService.ResetOccurence();
             return Ok("Occurence reset");
         }
-
     }
 }
